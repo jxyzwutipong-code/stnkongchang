@@ -9,6 +9,8 @@ let complaints = [];
 let currentFilter = 'ทั้งหมด';
 let timeFilterVal = 'ทั้งหมด';
 let actionCallback = null; // For confirm modal
+let currentPage = 1; // สำหรับแบ่งหน้ารายการคำร้อง
+const ITEMS_PER_PAGE = 9; // จำนวนการ์ดต่อหน้า
 
 // Sample Mock Data (Loaded if localStorage is empty)
 const MOCK_DATA = [
@@ -261,6 +263,7 @@ function closeDetailModal() {
 // Dashboard Render
 function setFilter(status) {
     currentFilter = status;
+    currentPage = 1;
     
     // Update UI styles for filter cards
     document.querySelectorAll('.stat-card').forEach(card => {
@@ -358,13 +361,21 @@ function renderDashboard() {
                 <p class="font-semibold">ไม่พบข้อมูลคำร้อง</p>
             </div>`;
         lucide.createIcons();
+        renderPagination(0, 1);
         return;
     }
 
     // Sort newest first
     filtered.sort((a,b) => new Date(b.startDate) - new Date(a.startDate));
 
-    filtered.forEach(c => {
+    // แบ่งหน้า (Pagination)
+    const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+    const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+    const pageItems = filtered.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+
+    pageItems.forEach(c => {
         const st = STATUS_CONFIG[c.status];
         
         // Format date roughly
@@ -411,6 +422,74 @@ function renderDashboard() {
         container.appendChild(card);
     });
     lucide.createIcons({ root: container });
+    renderPagination(filtered.length, totalPages);
+}
+
+// สร้างแถบเลขหน้า (Pagination Controls)
+function renderPagination(totalItems, totalPages) {
+    const pagContainer = document.getElementById('pagination-container');
+    if (!pagContainer) return;
+    pagContainer.innerHTML = '';
+
+    if (totalItems === 0 || totalPages <= 1) return;
+
+    const baseBtn = "min-w-[38px] h-[38px] px-2 flex items-center justify-center rounded-xl text-sm font-bold transition-all";
+    const inactiveBtn = `${baseBtn} bg-white border border-gray-200 text-gray-600 hover:bg-gray-50`;
+    const activeBtn = `${baseBtn} bg-brand text-white shadow-md`;
+    const disabledBtn = `${baseBtn} bg-gray-50 border border-gray-100 text-gray-300 cursor-not-allowed`;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = "flex items-center justify-center flex-wrap gap-2";
+
+    // ปุ่มก่อนหน้า
+    const prevBtn = document.createElement('button');
+    prevBtn.className = currentPage === 1 ? disabledBtn : inactiveBtn;
+    prevBtn.innerHTML = `<i data-lucide="chevron-left" class="w-4 h-4"></i>`;
+    if (currentPage !== 1) prevBtn.onclick = () => changePage(currentPage - 1);
+    wrapper.appendChild(prevBtn);
+
+    // คำนวณช่วงเลขหน้าที่จะแสดง (แสดงหน้าแรก, หน้าสุดท้าย, และหน้าใกล้เคียงหน้าปัจจุบัน)
+    const pagesToShow = new Set();
+    pagesToShow.add(1);
+    pagesToShow.add(totalPages);
+    for (let p = currentPage - 1; p <= currentPage + 1; p++) {
+        if (p >= 1 && p <= totalPages) pagesToShow.add(p);
+    }
+    const sortedPages = Array.from(pagesToShow).sort((a, b) => a - b);
+
+    let lastPage = 0;
+    sortedPages.forEach(p => {
+        if (lastPage && p - lastPage > 1) {
+            const dots = document.createElement('span');
+            dots.className = "min-w-[38px] h-[38px] flex items-center justify-center text-gray-400 text-sm font-bold";
+            dots.textContent = '...';
+            wrapper.appendChild(dots);
+        }
+        const pageBtn = document.createElement('button');
+        pageBtn.className = p === currentPage ? activeBtn : inactiveBtn;
+        pageBtn.textContent = p;
+        pageBtn.onclick = () => changePage(p);
+        wrapper.appendChild(pageBtn);
+        lastPage = p;
+    });
+
+    // ปุ่มถัดไป
+    const nextBtn = document.createElement('button');
+    nextBtn.className = currentPage === totalPages ? disabledBtn : inactiveBtn;
+    nextBtn.innerHTML = `<i data-lucide="chevron-right" class="w-4 h-4"></i>`;
+    if (currentPage !== totalPages) nextBtn.onclick = () => changePage(currentPage + 1);
+    wrapper.appendChild(nextBtn);
+
+    pagContainer.appendChild(wrapper);
+    lucide.createIcons({ root: pagContainer });
+}
+
+// เปลี่ยนหน้าที่กำลังแสดง
+function changePage(page) {
+    currentPage = page;
+    renderDashboard();
+    const container = document.getElementById('complaints-container');
+    if (container) container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Render D3 Chart function
@@ -528,7 +607,7 @@ function renderChart() {
 
 // Setup Form Event Listeners
 function setupEventListeners() {
-    document.getElementById('search-input').addEventListener('input', renderDashboard);
+    document.getElementById('search-input').addEventListener('input', () => { currentPage = 1; renderDashboard(); });
     
     // Time filter handling (PILLS)
     const timeBtns = document.querySelectorAll('.time-btn');
@@ -545,6 +624,7 @@ function setupEventListeners() {
             e.target.className = "time-btn px-4 py-2 rounded-full bg-slate-800 text-white text-sm font-medium shadow-sm transition-colors whitespace-nowrap";
             
             timeFilterVal = e.target.getAttribute('data-val');
+            currentPage = 1;
             
             if (timeFilterVal === 'กำหนดเอง') {
                 customDateContainer.classList.remove('hidden');
@@ -559,11 +639,11 @@ function setupEventListeners() {
 
     // Dropdowns
     document.getElementById('filter-status').addEventListener('change', (e) => setFilter(e.target.value));
-    document.getElementById('filter-dept').addEventListener('change', renderDashboard);
-    document.getElementById('filter-zone').addEventListener('change', renderDashboard);
+    document.getElementById('filter-dept').addEventListener('change', () => { currentPage = 1; renderDashboard(); });
+    document.getElementById('filter-zone').addEventListener('change', () => { currentPage = 1; renderDashboard(); });
 
     // Custom Dates
-    document.getElementById('filter-custom-date').addEventListener('change', () => { if (timeFilterVal === 'กำหนดเอง') renderDashboard(); });
+    document.getElementById('filter-custom-date').addEventListener('change', () => { if (timeFilterVal === 'กำหนดเอง') { currentPage = 1; renderDashboard(); } });
 
     // Re-render chart on window resize to keep it responsive
     window.addEventListener('resize', () => {
