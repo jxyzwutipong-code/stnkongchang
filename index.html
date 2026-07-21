@@ -179,7 +179,10 @@
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">รหัสผ่าน (Password)</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i data-lucide="lock" class="w-4 h-4"></i></span>
-                            <input type="password" id="login-password" placeholder="กรอกรหัสผ่าน" class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand focus:border-brand bg-white text-sm outline-none" required value="">
+                            <input type="password" id="login-password" placeholder="กรอกรหัสผ่าน" class="w-full pl-10 pr-11 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand focus:border-brand bg-white text-sm outline-none" required value="">
+                            <button type="button" id="toggle-password-btn" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-brand transition-colors focus:outline-none" tabindex="-1">
+                                <i id="toggle-password-icon" data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
                         </div>
                     </div>
                     <button type="submit" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg active:scale-95 text-center flex justify-center items-center gap-2">
@@ -317,10 +320,10 @@
                     
                     <!-- Search Row -->
                     <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-2">ค้นหา (ชื่อเรื่อง / เลขรับ / ผู้ร้อง)</label>
+                        <label class="block text-xs font-bold text-gray-600 mb-2">ค้นหา (ชื่อเรื่อง / เลขรับ / ผู้ร้อง / ผู้ดูแลงาน)</label>
                         <div class="relative flex-1">
                             <i data-lucide="search" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
-                            <input type="text" id="search-input" placeholder="กรอกคำค้นหา..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand outline-none text-sm font-medium transition-all bg-gray-50/50">
+                            <input type="text" id="search-input" placeholder="ค้นหาจากชื่อเรื่อง, เลขรับ, ผู้ร้อง หรือผู้ดูแลงาน..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand outline-none text-sm font-medium transition-all bg-gray-50/50">
                         </div>
                     </div>
                 </div>

@@ -90,6 +90,17 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
+// Toggle Password Visibility (Login field)
+function togglePasswordVisibility() {
+    const input = document.getElementById('login-password');
+    const btn = document.getElementById('toggle-password-btn');
+    const isHidden = input.type === 'password';
+
+    input.type = isHidden ? 'text' : 'password';
+    btn.innerHTML = `<i id="toggle-password-icon" data-lucide="${isHidden ? 'eye-off' : 'eye'}" class="w-4 h-4"></i>`;
+    lucide.createIcons({ root: btn });
+}
+
 // Authentication Mock
 document.getElementById('login-form').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -294,7 +305,7 @@ function renderDashboard() {
         const matchSearch = c.title.toLowerCase().includes(searchTerm) || 
                             (c.receiveNo && c.receiveNo.toLowerCase().includes(searchTerm)) ||
                             c.requester.toLowerCase().includes(searchTerm) ||
-                            c.supervisor.toLowerCase().includes(searchTerm);
+                            (c.supervisor && c.supervisor.toLowerCase().includes(searchTerm));
                             
         // 5. Time Filter
         let matchTime = true;
