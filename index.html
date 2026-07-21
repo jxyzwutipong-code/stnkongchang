@@ -40,7 +40,6 @@
         }
     </script>
     <style>
-        /* Custom Styles for smooth transitions and hiding scrollbars */
         body { font-family: 'Prompt', sans-serif; background-color: #F2F9F4; color: #333; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
@@ -254,12 +253,63 @@
                     </button>
                 </div>
 
-                <!-- Search and Filter Bar -->
-                <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 mb-6 md:mb-8 fade-in z-10 relative">
-                    <div class="flex flex-col gap-4">
-                        <div class="relative">
+                <!-- Search and Filter Bar (UPDATED) -->
+                <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 mb-6 md:mb-8 fade-in z-10 relative">
+                    
+                    <!-- Top Row: Time, Custom Date, Dept, Status -->
+                    <div class="flex flex-col xl:flex-row gap-5 items-start xl:items-end mb-5 border-b border-gray-100 pb-5">
+                        
+                        <!-- Timeframe Pills -->
+                        <div class="flex-1 w-full overflow-x-auto hide-scroll">
+                            <label class="block text-xs font-bold text-gray-600 mb-2">ช่วงเวลา</label>
+                            <div class="flex flex-nowrap md:flex-wrap gap-2 min-w-max md:min-w-0" id="time-filter-container">
+                                <button type="button" class="time-btn px-4 py-2 rounded-full bg-slate-800 text-white text-sm font-medium shadow-sm transition-colors whitespace-nowrap" data-val="ทั้งหมด">ทั้งหมด</button>
+                                <button type="button" class="time-btn px-4 py-2 rounded-full border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 bg-white transition-colors whitespace-nowrap" data-val="วันนี้">วันนี้</button>
+                                <button type="button" class="time-btn px-4 py-2 rounded-full border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 bg-white transition-colors whitespace-nowrap" data-val="สัปดาห์นี้">สัปดาห์นี้</button>
+                                <button type="button" class="time-btn px-4 py-2 rounded-full border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 bg-white transition-colors whitespace-nowrap" data-val="เดือนนี้">เดือนนี้</button>
+                                <button type="button" class="time-btn px-4 py-2 rounded-full border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 bg-white transition-colors whitespace-nowrap" data-val="ปีนี้">ปีนี้</button>
+                                <button type="button" class="time-btn px-4 py-2 rounded-full border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 bg-white transition-colors whitespace-nowrap" data-val="กำหนดเอง">กำหนดเอง</button>
+                            </div>
+                        </div>
+
+                        <!-- Custom Date -->
+                        <div id="custom-date-container" class="hidden w-full xl:w-auto flex flex-row gap-2 items-end">
+                            <div class="flex-1">
+                                <label class="block text-xs font-bold text-gray-600 mb-2">เลือกวันที่</label>
+                                <input type="date" id="filter-custom-date" class="w-full px-3 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand outline-none text-sm font-medium text-gray-700 h-[38px] bg-white">
+                            </div>
+                        </div>
+
+                        <div class="w-full xl:w-auto flex flex-col md:flex-row gap-4">
+                            <!-- Department -->
+                            <div class="w-full md:w-48">
+                                <label class="block text-xs font-bold text-gray-600 mb-2">หน่วยงาน</label>
+                                <select id="filter-dept" class="w-full px-3 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand outline-none text-sm font-medium text-gray-700 h-[38px] bg-white cursor-pointer">
+                                    <option value="ทั้งหมด">ทุกหน่วยงาน</option>
+                                    <option value="งานโยธา">งานโยธา</option>
+                                    <option value="ฝ่ายแผน">ฝ่ายแผน</option>
+                                </select>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="w-full md:w-48">
+                                <label class="block text-xs font-bold text-gray-600 mb-2">สถานะ</label>
+                                <select id="filter-status" class="w-full px-3 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand outline-none text-sm font-medium text-gray-700 h-[38px] bg-white cursor-pointer">
+                                    <option value="ทั้งหมด">ทุกสถานะ</option>
+                                    <option value="ยังไม่เริ่ม">ยังไม่เริ่ม</option>
+                                    <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
+                                    <option value="เสร็จสมบูรณ์แล้ว">เสร็จสมบูรณ์แล้ว</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Search Row -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-2">ค้นหา (ชื่อเรื่อง / เลขรับ / ผู้ร้อง)</label>
+                        <div class="relative flex-1">
                             <i data-lucide="search" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
-                            <input type="text" id="search-input" placeholder="ค้นหา เลขรับ, เรื่อง, ผู้ร้อง, ผู้ดูแลงาน..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand outline-none text-sm font-medium transition-all">
+                            <input type="text" id="search-input" placeholder="กรอกคำค้นหา..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand outline-none text-sm font-medium transition-all bg-gray-50/50">
                         </div>
                     </div>
                 </div>
@@ -495,6 +545,7 @@
 
         let complaints = [];
         let currentFilter = 'ทั้งหมด';
+        let timeFilterVal = 'ทั้งหมด';
         let actionCallback = null; // For confirm modal
 
         // Sample Mock Data (Loaded if localStorage is empty)
@@ -734,20 +785,67 @@
                     card.classList.remove('ring-2');
                 }
             });
+
+            // Sync with dropdown filter
+            const statusDropdown = document.getElementById('filter-status');
+            if (statusDropdown && statusDropdown.value !== status) {
+                statusDropdown.value = status;
+            }
+
             renderDashboard();
         }
 
         function renderDashboard() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            
             // Filter logic
             let filtered = complaints.filter(c => {
+                // 1. Status Filter
                 const matchStatus = currentFilter === 'ทั้งหมด' || c.status === currentFilter;
+                
+                // 2. Department Filter
+                const deptVal = document.getElementById('filter-dept').value;
+                const matchDept = deptVal === 'ทั้งหมด' || c.department === deptVal;
+
+                // 3. Search Filter
                 const matchSearch = c.title.toLowerCase().includes(searchTerm) || 
                                     (c.receiveNo && c.receiveNo.toLowerCase().includes(searchTerm)) ||
                                     c.requester.toLowerCase().includes(searchTerm) ||
                                     c.supervisor.toLowerCase().includes(searchTerm);
-                return matchStatus && matchSearch;
+                                    
+                // 4. Time Filter
+                let matchTime = true;
+                if (c.startDate && timeFilterVal !== 'ทั้งหมด') {
+                    // ป้องกันปัญหา Timezone โดยอ่านค่าแยกส่วน
+                    const [cYear, cMonth, cDay] = c.startDate.split('-').map(Number);
+                    const cDateOnly = new Date(cYear, cMonth - 1, cDay);
+
+                    if (timeFilterVal === 'วันนี้') {
+                        matchTime = cDateOnly.getTime() === today.getTime();
+                    } else if (timeFilterVal === 'สัปดาห์นี้') {
+                        const startOfWeek = new Date(today);
+                        startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday
+                        const endOfWeek = new Date(today);
+                        endOfWeek.setDate(today.getDate() - today.getDay() + 6); // Saturday
+                        matchTime = cDateOnly >= startOfWeek && cDateOnly <= endOfWeek;
+                    } else if (timeFilterVal === 'เดือนนี้') {
+                        matchTime = cDateOnly.getMonth() === today.getMonth() && cDateOnly.getFullYear() === today.getFullYear();
+                    } else if (timeFilterVal === 'ปีนี้') {
+                        matchTime = cDateOnly.getFullYear() === today.getFullYear();
+                    } else if (timeFilterVal === 'กำหนดเอง') {
+                        const customDateVal = document.getElementById('filter-custom-date').value;
+                        if(customDateVal) {
+                            const [sYear, sMonth, sDay] = customDateVal.split('-').map(Number);
+                            const cDate = new Date(sYear, sMonth - 1, sDay);
+                            matchTime = cDateOnly.getTime() === cDate.getTime();
+                        }
+                    }
+                }
+
+                return matchStatus && matchSearch && matchTime && matchDept;
             });
 
             // Update Stats
@@ -928,6 +1026,40 @@
         function setupEventListeners() {
             document.getElementById('search-input').addEventListener('input', renderDashboard);
             
+            // Time filter handling (PILLS)
+            const timeBtns = document.querySelectorAll('.time-btn');
+            const customDateContainer = document.getElementById('custom-date-container');
+
+            timeBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // Reset all buttons styling
+                    timeBtns.forEach(b => {
+                        b.className = "time-btn px-4 py-2 rounded-full border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 bg-white transition-colors whitespace-nowrap";
+                    });
+                    
+                    // Set active styling to clicked button
+                    e.target.className = "time-btn px-4 py-2 rounded-full bg-slate-800 text-white text-sm font-medium shadow-sm transition-colors whitespace-nowrap";
+                    
+                    timeFilterVal = e.target.getAttribute('data-val');
+                    
+                    if (timeFilterVal === 'กำหนดเอง') {
+                        customDateContainer.classList.remove('hidden');
+                        customDateContainer.classList.add('flex');
+                    } else {
+                        customDateContainer.classList.add('hidden');
+                        customDateContainer.classList.remove('flex');
+                        renderDashboard();
+                    }
+                });
+            });
+
+            // Dropdowns
+            document.getElementById('filter-status').addEventListener('change', (e) => setFilter(e.target.value));
+            document.getElementById('filter-dept').addEventListener('change', renderDashboard);
+
+            // Custom Dates
+            document.getElementById('filter-custom-date').addEventListener('change', () => { if (timeFilterVal === 'กำหนดเอง') renderDashboard(); });
+
             // Re-render chart on window resize to keep it responsive
             window.addEventListener('resize', () => {
                 if (!document.getElementById('view-dashboard').classList.contains('hidden')) {
